@@ -1,9 +1,13 @@
 package com.markcorrado.gpsexercise;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -33,6 +37,30 @@ public class MapsActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+
+        LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //Ask the user to enable GPS
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Location Manager");
+            builder.setMessage("Would you like to enable GPS?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //Launch settings, allowing user to make a change
+                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //No location service, no Activity
+                    finish();
+                }
+            });
+            builder.create().show();
+        }
     }
 
     /**
