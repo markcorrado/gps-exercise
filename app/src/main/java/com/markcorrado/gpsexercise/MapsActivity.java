@@ -102,14 +102,20 @@ public class MapsActivity extends FragmentActivity {
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
-                //makeUseOfNewLocation(location);
                 if(isBetterLocation(location, mLastKnownLocation)) {
+                    //Onlu update location when distance is > one mile
                     if(currentLocationMarker != null) {
+                        if(location.distanceTo(mLastKnownLocation) > MILE) {
+                            LatLng oldLocation = currentLocationMarker.getPosition();
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(oldLocation.latitude, oldLocation.longitude)).title("Old Location"));
+                        }
                         currentLocationMarker.remove();
                     }
+
                     mLastKnownLocation = location;
                     currentLocationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude())).title("You are here"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()), 16));
+
                 }
             }
 
