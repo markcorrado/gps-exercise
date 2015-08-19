@@ -20,8 +20,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity {
 
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
-    private static final float TWO_MILES = 3218;
+    private static final int TEN_SECONDS = 1000 * 10;
+    private static final float MILE = 1609;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Location mLastKnownLocation;
     private Marker currentLocationMarker;
@@ -36,14 +36,13 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
 
         LocationManager manager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             //Ask the user to enable GPS
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Location Manager");
-            builder.setMessage("Would you like to enable GPS?");
+            builder.setMessage("GPS is required for this app, would you like to enable it?");
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -88,18 +87,17 @@ public class MapsActivity extends FragmentActivity {
             if (mMap != null) {
                 setUpMap();
             }
+
+
         }
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        String locationProvider = LocationManager.NETWORK_PROVIDER;
+        String locationProvider = LocationManager.GPS_PROVIDER;
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -123,7 +121,7 @@ public class MapsActivity extends FragmentActivity {
         };
 
         // Register the listener with the Location Manager to receive location updates( Provider, min time between updates, max distance between updates, listener)
-        locationManager.requestLocationUpdates(locationProvider, TWO_MINUTES, TWO_MILES, locationListener);
+        locationManager.requestLocationUpdates(locationProvider, TEN_SECONDS, MILE, locationListener);
     }
 
     /** Determines whether one Location reading is better than the current Location fix
@@ -138,8 +136,8 @@ public class MapsActivity extends FragmentActivity {
 
         // Check whether the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isSignificantlyNewer = timeDelta > TEN_SECONDS;
+        boolean isSignificantlyOlder = timeDelta < -TEN_SECONDS;
         boolean isNewer = timeDelta > 0;
 
         // If it's been more than two minutes since the current location, use the new location
